@@ -37,6 +37,6 @@ export class UploadsController {
     },
   })
   uploadFile(@UploadedFile() file: any) {
-    return { url: `http://localhost:3000/uploads/${file.filename}` };
+    return { url: `/uploads/${file.filename}` };
   }
 }
