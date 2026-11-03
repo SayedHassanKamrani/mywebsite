@@ -38,6 +38,7 @@ import { UploadsController } from './uploads/uploads.controller.js';
           logging: false,
         };
       },
+      
     }),
 
     ProjectsModule,
