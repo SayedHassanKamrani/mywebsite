@@ -1,13 +1,9 @@
-import {
-  Controller,
-  Post,
-  UploadedFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { Request } from 'express'; // اضافه شد
 
 @ApiTags('uploads')
 @Controller('uploads')
@@ -17,7 +13,11 @@ export class UploadsController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: './uploads',
-        filename: (req, file, cb) => {
+        filename: (
+          req: Request, 
+          file: Express.Multer.File, 
+          cb: (error: Error | null, filename: string) => void
+        ) => {
           const randomName = Array(32)
             .fill(null)
             .map(() => Math.round(Math.random() * 16).toString(16))
@@ -37,7 +37,6 @@ export class UploadsController {
     },
   })
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    // آدرس کامل عکس برای فرانت‌اند
     return { url: `http://localhost:3000/uploads/${file.filename}` };
   }
 }
