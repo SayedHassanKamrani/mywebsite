@@ -15,7 +15,7 @@ export class UploadsController {
         destination: './uploads',
         filename: (
           req: Request, 
-          file: Express.Multer.File, 
+          file: any, 
           cb: (error: Error | null, filename: string) => void
         ) => {
           const randomName = Array(32)
@@ -36,7 +36,7 @@ export class UploadsController {
       },
     },
   })
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  uploadFile(@UploadedFile() file: any) {
     return { url: `http://localhost:3000/uploads/${file.filename}` };
   }
 }
