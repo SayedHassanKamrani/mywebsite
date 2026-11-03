@@ -13,33 +13,38 @@ import { UploadsController } from './uploads/uploads.controller.js';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-          useFactory: (config: ConfigService) => {
-        const dbUrl = config.get<string>('DATABASE_URL');
-        if (dbUrl) {
-          return {
-            type: 'postgres',
-            url: dbUrl,
-            entities: [Project, Media, Lead],
-            synchronize: true, // فقط برای شروع؛ بعداً به false تغییر دهید
-            ssl: { rejectUnauthorized: false }, // برای اتصال امن به Render
-          };
-        }
-        return {
-          type: 'postgres',
-          host: config.get<string>('DATABASE_HOST', 'localhost'),
-          port: config.get<number>('DATABASE_PORT', 5432),
-          username: config.get<string>('DATABASE_USER', 'postgres'),
-          password: config.get<string>('DATABASE_PASSWORD', 'postgres'),
-          database: config.get<string>('DATABASE_NAME', 'portfolio'),
-          entities: [Project, Media, Lead],
-          synchronize: true,
-          logging: false,
-        };
-      },
-      
-    }),
+  TypeOrmModule.forRootAsync({
+  inject: [ConfigService],
+  useFactory: (config: ConfigService) => {
+    const databaseUrl = config.get<string>('DATABASE_URL');
+
+    // اگر DATABASE_URL تنظیم شده باشد (محیط Render)، از آن استفاده کن
+    if (databaseUrl) {
+      return {
+        type: 'postgres',
+        url: databaseUrl,
+        entities: [Project, Media, Lead],
+        synchronize: false, // در محیط پروداکشن باید false باشد
+        ssl: {
+          rejectUnauthorized: false, // برای اتصال امن به دیتابیس‌های ابری مثل Render
+        },
+      };
+    }
+
+    // در غیر این صورت (محیط لوکال)، از تنظیمات قبلی خودت استفاده کن
+    return {
+      type: 'postgres',
+      host: config.get<string>('DATABASE_HOST', 'localhost'),
+      port: config.get<number>('DATABASE_PORT', 5432),
+      username: config.get<string>('DATABASE_USER', 'postgres'),
+      password: config.get<string>('DATABASE_PASSWORD', 'postgres'),
+      database: config.get<string>('DATABASE_NAME', 'portfolio'),
+      entities: [Project, Media, Lead],
+      synchronize: true, // فقط در لوکال true باشد
+      logging: false,
+    };
+  },
+}),
 
     ProjectsModule,
     LeadsModule,
