@@ -36,7 +36,8 @@ export class UploadsController {
       },
     },
   })
-  uploadFile(@UploadedFile() file: any) {
+   uploadFile(@UploadedFile() file: any) {
+    // به جای آدرس کامل، فقط مسیر نسبی را برمی‌گردانیم
     return { url: `/uploads/${file.filename}` };
   }
 }
